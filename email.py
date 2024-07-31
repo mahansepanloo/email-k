@@ -3,6 +3,29 @@ import json
 import os  
 import datetime
 
+class User:  
+    def __init__(self, username, password, is_admin=False):  
+        self.username = username
+        self.password = password 
+        self.is_admin = is_admin  
+        self.inbox = []  
+        self.sent_emails = []  
+
+
+    def add_email(self, email):  
+        self.inbox.append(email)  
+
+    def add_sent_email(self, email):  
+        self.sent_emails.append(email)  
+
+    def view_sent_emails(self):  
+        if self.sent_emails:  
+            print(f"Sent emails from {self.username}:")  
+            for email in self.sent_emails:  
+                print(email)  
+        else:  
+            print(f"No sent emails from {self.username}.")  
+
 
 class Email:  
     def __init__(self, sender, receiver, text):  
@@ -101,6 +124,81 @@ class EmailSystem:
             print("Password changed successfully.")  
         else:  
             print("Current password is incorrect or user does not exist.")  
+
+
+def main():  
+    email_system = EmailSystem()  
+
+    while True:  
+        username = input('Enter username: ')  
+        password = input('Enter password: ')  
+        user = email_system.login(username, password)  
+        if not user:  
+            continue
+
+        
+        if email_system.is_admin(user):  
+            while True:  
+                print("\nAdmin Menu:")  
+                print("1. Register a new user")  
+                print("2. Logout")  
+                print("3. Exit")  
+                
+                choice = input("Choose an option: ")  
+
+                if choice == '1':  
+                    new_username = input('Enter username to register: ')  
+                    new_password = input('Enter password to register: ')  
+                    email_system.register(new_username, new_password)  
+                elif choice == '2':  
+                    print("Logged out.")  
+                    break  
+                elif choice == '3':  
+                    print("Exiting the program.")  
+                    email_system.save_users_and_emails_to_file('email.json') 
+                    return  
+                else:  
+                    print("Invalid choice. Please try again.")  
+        else:  
+            while True:  
+                print("\nUser Menu:")  
+                print("1. Send Email")  
+                print("2. View Inbox")  
+                print("3. View Sent Emails")  
+                print("4. Logout")  
+                print("5. Exit")  
+                print("6.change password")
+
+                user_choice = input("Choose an option: ")  
+
+                if user_choice == '1':  
+                    receiver_username = input('Send to: ')  
+                    text = input('Text: ')  
+                    email_system.send_email(user, receiver_username, text)  
+
+                elif user_choice == '2':  
+                    email_system.view_inbox(user)  
+
+                elif user_choice == '3':  
+                    user.view_sent_emails()  
+
+                elif user_choice == '4':  
+                    print("Logged out.")  
+                    break  
+                elif user_choice == '5':  
+                    print("Exiting the program.")  
+                    email_system.save_users_and_emails_to_file('email.json') 
+                    return  
+                elif user_choice == '6':  
+                    current_password = input("Enter current password: ")  
+                    new_password = input('Enter new password: ')  
+                    email_system.change_password(user.username, current_password, new_password)  
+                
+                else:  
+                    print("Invalid choice. Please try again.")  
+
+if __name__ == "__main__":  
+    main()
 
 
 
